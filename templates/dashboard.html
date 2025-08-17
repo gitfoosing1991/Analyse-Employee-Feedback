@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Feedback Analysis Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+        .theme-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f1f8ff;
+            border-radius: 4px;
+            border-left: 4px solid #0d6efd;
+        }
+        .sentiment-meter {
+            height: 20px;
+            border-radius: 10px;
+            margin: 5px 0;
+            background: linear-gradient(to right, #dc3545, #ffc107, #28a745);
+        }
+        .sentiment-marker {
+            width: 10px;
+            height: 30px;
+            background-color: #212529;
+            border-radius: 3px;
+            position: relative;
+            top: -25px;
+        }
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header-actions">
+            <h1>Feedback Analysis Dashboard</h1>
+            <div>
+                <a href="/" class="btn btn-outline-secondary">Back to Upload</a>
+                <a href="/download" class="btn btn-primary">Download Full Report</a>
+            </div>
+        </div>
+        
+        <!-- Analysis Summary -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Analysis Summary</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <h4>Feedback Entries</h4>
+                        <h2 id="total-entries">-</h2>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <h4>Main Themes</h4>
+                        <h2 id="total-themes">-</h2>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <h4>Sub Themes</h4>
+                        <h2 id="total-sub-themes">-</h2>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <h4>Average Sentiment</h4>
+                        <h2 id="avg-sentiment">-</h2>
+                        <div class="sentiment-meter">
+                            <div class="sentiment-marker" id="sentiment-marker" style="left: 50%;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <small>Negative</small>
+                            <small>Positive</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Theme Distribution -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Main Theme Distribution with Sentiment</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="themeChart"></canvas>
+                </div>
+                <div class="text-center mt-3">
+                    <div class="d-flex justify-content-center">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Theme Details -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Theme Details</h3>
+            </div>
+            <div class="card-body">
+                <div id="theme-details">
+                    <!-- Will be populated with JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sample Feedback Entries -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Sample Feedback Entries</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Main Theme</th>
+                                <th>Sub-theme</th>
+                                <th>Feedback</th>
+                                <th>Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sample-feedback">
+                            <!-- Will be populated with JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchDashboardData();
+        });
+        
+        // Function to fetch dashboard data
+        function fetchDashboardData() {
+            fetch('/dashboard-data')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No analysis data available');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    populateDashboard(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.querySelector('.dashboard-container').innerHTML = `
+                        <div class="alert alert-warning">
+                            <h3>No analysis data available</h3>
+                            <p>Please complete an analysis first.</p>
+                            <a href="/" class="btn btn-primary">Go to Upload Form</a>
+                        </div>
+                    `;
+                });
+        }
+        
+        
+        // Function to populate dashboard with data
+        function populateDashboard(data) {
+            // Update summary metrics
+            document.getElementById('total-entries').textContent = data.total_entries;
+            document.getElementById('total-themes').textContent = data.main_themes.length;
+            document.getElementById('total-sub-themes').textContent = data.sub_themes.length;
+            
+            const avgSentiment = data.average_sentiment.toFixed(2);
+            document.getElementById('avg-sentiment').textContent = avgSentiment;
+            
+            // Position the sentiment marker (convert from -1 to 1 scale to 0-100%)
+            const sentimentPercent = ((parseFloat(avgSentiment) + 1) / 2) * 100;
+            document.getElementById('sentiment-marker').style.left = sentimentPercent + '%';
+            
+            // Calculate average sentiment per theme and add to main_themes
+            const themeData = [...data.main_themes];
+            themeData.forEach(theme => {
+                // Get all entries for this theme from sample data
+                const themeEntries = data.sample_entries.filter(entry => entry.main_theme === theme.name);
+                if (themeEntries.length > 0) {
+                    // Calculate average sentiment for this theme
+                    const sum = themeEntries.reduce((total, entry) => total + entry.sentiment, 0);
+                    theme.avgSentiment = sum / themeEntries.length;
+                } else {
+                    theme.avgSentiment = 0;
+                }
+            });
+            
+            // Create theme distribution chart with sentiment breakdown
+            createThemeChart(themeData, data.sentiment_distribution);
+            
+            // Populate theme details with the enhanced theme data
+            populateThemeDetails(themeData, data.sub_themes);
+            
+            // Populate sample feedback table
+            populateSampleFeedback(data.sample_entries);
+        }
+        
+        // Function to create theme distribution chart with sentiment breakdown
+        function createThemeChart(mainThemes, sentimentData) {
+            const ctx = document.getElementById('themeChart').getContext('2d');
+            const labels = mainThemes.map(theme => theme.name);
+            
+            // Use actual sentiment counts for each theme
+            const positiveData = mainThemes.map(theme => theme.positive_count);
+            const neutralData = mainThemes.map(theme => theme.neutral_count);
+            const negativeData = mainThemes.map(theme => theme.negative_count);
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Positive',
+                            data: positiveData,
+                            backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Neutral',
+                            data: neutralData,
+                            backgroundColor: 'rgba(255, 193, 7, 0.7)',
+                            borderColor: 'rgba(255, 193, 7, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Negative',
+                            data: negativeData,
+                            backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                            borderColor: 'rgba(220, 53, 69, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                footer: function(tooltipItems) {
+                                    // Calculate total for this theme
+                                    const index = tooltipItems[0].dataIndex;
+                                    const theme = mainThemes[index];
+                                    return `Total: ${theme.count} | Avg Sentiment: ${theme.avg_sentiment.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Function to populate theme details
+        function populateThemeDetails(mainThemes, subThemes) {
+            const container = document.getElementById('theme-details');
+            container.innerHTML = '';
+            
+            mainThemes.forEach(theme => {
+                const themeSubthemes = subThemes.filter(st => st.main_theme === theme.name);
+                
+                const themeElement = document.createElement('div');
+                themeElement.className = 'theme-item';
+                
+                let subthemesList = '';
+                if (themeSubthemes.length > 0) {
+                    subthemesList = '<ul>' + 
+                        themeSubthemes.map(st => 
+                            `<li><strong>${st.name}</strong>: ${st.count} entries</li>`
+                        ).join('') + 
+                    '</ul>';
+                }
+                
+                // Get sentiment class based on average sentiment
+                const avgSentiment = theme.avg_sentiment || 0;
+                let sentimentClass = 'bg-warning';
+                if (avgSentiment > 0.3) sentimentClass = 'bg-success';
+                if (avgSentiment < -0.3) sentimentClass = 'bg-danger';
+                
+                themeElement.innerHTML = `
+                    <h4>
+                        ${theme.name} 
+                        <span class="badge bg-primary">${theme.count} entries</span>
+                        <span class="badge ${sentimentClass}">Avg Sentiment: ${avgSentiment.toFixed(2)}</span>
+                    </h4>
+                    ${subthemesList}
+                `;
+                
+                container.appendChild(themeElement);
+            });
+        }
+        
+        // Function to populate sample feedback
+        function populateSampleFeedback(samples) {
+            const tbody = document.getElementById('sample-feedback');
+            tbody.innerHTML = '';
+            
+            samples.forEach(entry => {
+                const row = document.createElement('tr');
+                
+                // Determine sentiment class
+                let sentimentClass = 'text-warning';
+                if (entry.sentiment > 0.3) sentimentClass = 'text-success';
+                if (entry.sentiment < -0.3) sentimentClass = 'text-danger';
+                
+                row.innerHTML = `
+                    <td>${entry.main_theme}</td>
+                    <td>${entry.sub_theme}</td>
+                    <td>${entry.text.length > 100 ? entry.text.substring(0, 100) + '...' : entry.text}</td>
+                    <td class="${sentimentClass}">${entry.sentiment.toFixed(2)}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
