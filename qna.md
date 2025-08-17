@@ -1,4 +1,4 @@
-# Learning Notes: 
+# Questions & Answers: 
 
 **When using Direct GPT Analysis method, why is the batch size for Theme Discovery (step 1) set at 100, but Theme Assignment (step 2) set at 5?**
 

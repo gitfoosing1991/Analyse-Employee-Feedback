@@ -1,6 +1,6 @@
 # Qualitative Analysis Tool
 
-A web application for analyzing qualitative data (e.g. employee feedback) using ChatGPT for theme detection and sentiment analysis. This tool helps organizations extract meaningful insights from qualitative feedback data.
+A Python application for analyzing qualitative data (e.g. employee feedback) using ChatGPT for theme detection and sentiment analysis. This tool helps organizations extract meaningful insights from qualitative feedback data.
 
 **Benefits:**
 Unlike the ChatGPT web interface, this app can directly process Excel files and automatically assign main themes and sub-themes to each response, outputting structured results—no manual copy-paste or formatting required. As the app has the ability to read all responses before generating themes, the themes are more consistent and context-aware across your datasets.
@@ -133,7 +133,7 @@ This method is best for small datasets and provides detailed, individualized ana
 
 - The **Clustering Method** is much more cost-efficient for large datasets, as it minimizes the number of expensive GPT API calls by using embeddings and clustering. Typical usage for 1000 responses is around 170,000 tokens.
 - The **Direct GPT Method** is more expensive for large datasets, as it requires more frequent and larger GPT API calls. For 1000 responses, token usage can be around 680,000 tokens.
-- For more information, refer to Learning.md
+- For more information, refer to qna.md
 
 Choose the Clustering Method for large datasets to save on cost and processing time. Use the Direct GPT Method for small datasets when you want more individualized analysis.
 
