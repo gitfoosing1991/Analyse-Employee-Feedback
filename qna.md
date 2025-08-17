@@ -21,22 +21,6 @@ Batching helps reduce network overhead and can speed up processing, but does not
 So, batching embeddings helps with performance, not token savings.
 
 ---
-**Can you explain Principal Component Analysis Variance?**
-
-Principal Component Analysis (PCA) is a dimensionality reduction technique used in machine learning. It transforms high-dimensional data into a lower-dimensional representation while retaining most of the original data's variance.
-
-Imagine you have a big box of colored pencils—100 different colors. You want to organize them, but carrying all 100 is heavy and sometimes you don’t need every single shade.
-
-PCA variance is like deciding how many pencils you need to keep so you can still draw almost any picture you want:
-
-If you keep 99 pencils (99% variance), you have almost every color—your drawings will look very close to the original.
-If you keep only 80 pencils (80% variance), you have fewer colors, but you can still draw most things, just with less detail or fewer shades.
-
-In data analysis, PCA variance is about how much of the “color” (information) you keep when you simplify your data. Higher variance means you keep more detail; lower variance means you keep less, making things simpler but possibly missing some subtle differences.
-
-So, adjusting PCA variance is like choosing how many colored pencils to carry: more pencils (higher variance) means more detail, fewer pencils (lower variance) means less detail but easier to manage. It doesn’t change how many pictures (clusters) you draw—just how detailed each picture can be.
-
----
 **Why is Principal Component Analysis (PCA) used in the clustering methodology?**
 
 PCA is used in the clustering methodology to make the clustering process more effective and efficient. Here’s a simple analogy and explanation:
@@ -53,7 +37,52 @@ Without PCA, clustering on high-dimensional data can be slow, less accurate, and
 
 So, PCA helps you “tidy up” your data before clustering, making the results more meaningful and the process more efficient.
 
+---
+**Can you explain Principal Component Analysis Variance?**
 
+Principal Component Analysis (PCA) is a dimensionality reduction technique used in machine learning. It transforms high-dimensional data into a lower-dimensional representation while retaining most of the original data's variance.
+
+Imagine you have a big box of colored pencils—100 different colors. You want to organize them, but carrying all 100 is heavy and sometimes you don’t need every single shade.
+
+PCA variance is like deciding how many pencils you need to keep so you can still draw almost any picture you want:
+
+If you keep 99 pencils (99% variance), you have almost every color—your drawings will look very close to the original.
+If you keep only 80 pencils (80% variance), you have fewer colors, but you can still draw most things, just with less detail or fewer shades.
+
+In data analysis, PCA variance is about how much of the “color” (information) you keep when you simplify your data. Higher variance means you keep more detail; lower variance means you keep less, making things simpler but possibly missing some subtle differences.
+
+So, adjusting PCA variance is like choosing how many colored pencils to carry: more pencils (higher variance) means more detail, fewer pencils (lower variance) means less detail but easier to manage. It doesn’t change how many pictures (clusters) you draw—just how detailed each picture can be.
+
+---
+**Can you explain what is K-means and why is Principal Component Analysis used with K-means?**
+
+K-means clustering is a way for a computer to group similar things together without being told exactly what the groups are.
+
+Breaking down the name:
+
+  - K → The number of groups (clusters) you want. You decide this before starting.
+
+  - Means → Each group is represented by its mean (average position of all points in that group).
+
+  - Clustering → The act of grouping data points.
+
+Suppose you want to cluster customers:
+
+  - Raw data: 50 features (age, income, spending habits, hobbies, etc.).
+
+  - PCA: Reduces to 2 dimensions (say, luxury preference and budget sensitivity).
+
+  - K-means: Finds 3 clusters →
+
+    - Cluster 1: High luxury, low budget sensitivity (premium shoppers).
+
+    - Cluster 2: Low luxury, high budget sensitivity (bargain hunters).
+
+    - Cluster 3: Middle ground.
+
+Without PCA, K-means might get confused with so many overlapping features.
+
+    
 ---
 
 **What is the breakdown of the token cost estimates for both analysis method?**
